@@ -1,0 +1,10 @@
+[Unit]
+Description=ServiceReport
+Wants=kdump.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/servicereport -r
+
+[Install]
+WantedBy=multi-user.target

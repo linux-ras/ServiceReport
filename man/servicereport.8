@@ -1,0 +1,88 @@
+.TH SERIVEREPORT "Feb 2019" Linux "Validate and repair the system configuration"
+.SH NAME
+ServiceReport \- A tool to verify and repair the system configuration.
+.SH SYNOPSIS
+.B servicereport [-f LOG_FILE] [-h] [-l] [-p PLUGIN [PLUGIN ...] [-d]
+                   [-q] [-r] [-V] [-v]
+.SH DESCRIPTION
+The \fIservicereport\fR command provides the system configuration status and gives
+recommendations to fix the incorrect system configurations. The tool also has an
+option to auto-fix the invalid configurations.
+\fIServiceReport\fR has plugin based architecture and has multiple plugins that
+validates and repair different system configuration. The description of plugins
+is listed below.
+.RS
+.TP
+.B Daemon
+Checks a list of daemons is enabled in the system or not.
+.TP
+.B Dump
+Detects which dump mechanism is configured (Kdump or FADump) based on that
+checks the configuration of the respective dump tool.
+.TP
+.B HTX
+Checks the configuration for Hardware Test Executive(HTX). This plugin is
+only applicable to PowerPC architecture.
+.TP
+.B Package
+Checks a list of packages is installed in the system or not.
+.RE
+.PP
+The \fIServiceReport\fR tool also provide an option to auto fix the incorrect
+configurations. Not all the validation performed in the plugins are auto
+fixable. \fIServiceReport\fR try to fix the incorrect configurations if possible
+else they need to be fixed manually.
+.PP
+.B NOTE: The tool supports auto-fix feature for Daemon, Package and Kdump validations only.
+.PP
+Please refer the example section to quick start with repair functionality.
+.SH OPTIONS
+.TP
+.B \-f \--file <LOG_FILE>
+Creates LOG_FILE in the current directory and stores the logs into it.
+.TP
+.B \-h \--help
+Prints usage of the tool and exits.
+.TP
+.B \-l \--list-plugins
+List all the applicable plugins.
+.TP
+.B \-p \--plugins
+validates the specified plugins only. Accept multiple plugins as a space separated list.
+.TP
+.B \-d \--dump
+Triggers a dump if dump tool (Kdump, FADump) is configured correctly.
+.TP
+.B \-q \--quiet
+Execute all plugins silently without printing any output on the console.
+.TP
+.B \-r \--repair
+Auto fix the incorrect configurations.
+.TP
+.B \-V, \--version
+Prints the version of tool and exits.
+.TP
+.B \-v \--verbose
+Increase the logging verbosity. Display the status of each sub check performed by the plugins.
+.SH EXAMPLES
+.TP
+.B servicereport
+Runs and print the status of all the applicable plugins in current system.
+.TP
+.B servicereport -v
+Runs all the applicable plugins to current system and print the detailed status of each plugin.
+.TP
+.B servicereport -l
+List all the applicable plugins.
+.TP
+.B servicereport -p P1 P2
+Runs only P1 and P2 plugins if applicable.
+.TP
+.B servicereport -r
+Repair the incorrect configuration after the validation.
+.SH AUTHORS & CONTRIBUTORS
+Sourabh Jain <sourabhjain@linux.ibm.com>
+.RS
+.RE
+Srikanth Aithal <sraithal@linux.vnet.ibm.com>
+.fi

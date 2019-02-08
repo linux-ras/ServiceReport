@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# (C) Copyright IBM Corp. 2018, 2019
+# Author: Sourabh Jain <sourabhjain@linux.ibm.com>
+
+"""Entry point script"""
+
+import sys
+
+from servicereportpkg import main
+
+if __name__ == "__main__":
+    sys.exit(main())
