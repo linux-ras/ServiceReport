@@ -12,6 +12,10 @@ from servicereportpkg.validate.plugins import Plugin
 from servicereportpkg.validate.schemes.schemes import PSeriesScheme
 from servicereportpkg.validate.schemes.schemes import BMCPowerNVScheme
 from servicereportpkg.validate.schemes.schemes import FSPSPowerNVScheme
+from servicereportpkg.validate.schemes.schemes import FedoraScheme
+from servicereportpkg.validate.schemes.schemes import SuSEScheme
+from servicereportpkg.validate.schemes.schemes import RHELScheme
+from servicereportpkg.validate.schemes.schemes import UbuntuScheme
 
 
 def generate_daemon_check(self, daemon):
@@ -44,6 +48,30 @@ class Daemon():
         for daemon in self.daemons:
             setattr(self, "check_%s" % daemon,
                     generate_daemon_check(self, daemon))
+
+
+class FedoraDaemon(Daemon, Plugin, FedoraScheme):
+    """Evaluates the daemons on Fedora"""
+
+    daemons = ["irqbalance"]
+
+
+class REHLDaemon(Daemon, Plugin, RHELScheme):
+    """Evaluates the daemons on Fedora"""
+
+    daemons = ["irqbalance"]
+
+
+class SuSEDaemon(Daemon, Plugin, UbuntuScheme):
+    """Evaluates the daemons on Fedora"""
+
+    daemons = ["irqbalance"]
+
+
+class UbuntuDaemon(Daemon, Plugin, SuSEScheme):
+    """Evaluates the daemons on Fedora"""
+
+    daemons = ["irqbalance"]
 
 
 class PSeriesDaemon(Daemon, Plugin, PSeriesScheme):
