@@ -1,7 +1,7 @@
 # ServiceReport
 
 ServiceReport is a tool to validate and repair system configuration for
-specific purposes. Initially envisaged to help setup systems for correctly
+specific purposes. Initially envisaged to help setup systems for correct
 First Failure Data Capture (FFDC), it has now morphed into a plugin based
 framework which can do more than just FFDC validation.
 
