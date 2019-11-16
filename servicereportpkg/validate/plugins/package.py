@@ -48,23 +48,24 @@ class Package():
 
 class RHELPackage(Package, Plugin, RHELScheme):
     """Evaluates the packages on RHEL"""
-    packages = ["sos", "perf"]
+    packages = ["sos", "perf", "irqbalance"]
 
 
 class FedoraPackage(Package, Plugin, FedoraScheme):
     """Evaluates the packages on Fedora"""
-    packages = ["sos", "perf"]
+    packages = ["sos", "perf", "irqbalance"]
 
 
 class UbuntuPackage(Package, Plugin, UbuntuScheme):
     """Evaluates the packages on Ubuntu"""
-    packages = ["sosreport", "linux-tools-generic", "linux-tools-common"]
+    packages = ["sosreport", "linux-tools-generic", "linux-tools-common",
+                "irqbalance"]
 
 
 class SuSEPackage(Package, Plugin, SuSEScheme):
     """Evaluates the packages of SuSE"""
 
-    packages = ["supportutils", "perf"]
+    packages = ["supportutils", "perf", "irqbalance"]
 
 
 class PowerPCPackage(Package, Plugin, PowerPCScheme):
