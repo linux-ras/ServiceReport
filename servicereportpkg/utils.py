@@ -86,9 +86,9 @@ def get_system_platform():
         with open(cpuinfo_file) as o_file:
             for line in o_file:
                 if "platform" in line:
-                    name = line.split()[1]
+                    name = line.split(':')[1]
                     system_platform = name.strip()
-                    return system_platform
+                    return system_platform.lower()
 
     except IOError as io_error:
         log.debug("Failed to open file: /proc/cpuinfo, error: %s", io_error)
