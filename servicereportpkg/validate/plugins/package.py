@@ -70,7 +70,31 @@ class SuSEPackage(Package, Plugin, SuSEScheme):
 class PowerPCPackage(Package, Plugin, PowerPCScheme):
     """Evaluates the packages on PowerPC"""
 
-    packages = ["ppc64-diag", "powerpc-ibm-utils"]
+    packages = ["ppc64-diag"]
+
+
+class RHELPowerPCPackage(Package, Plugin, PowerPCScheme, RHELScheme):
+    """Evaluates the RHEL packages on PowerPC"""
+
+    packages = ["powerpc-utils"]
+
+
+class FedoraPowerPCPackage(Package, Plugin, PowerPCScheme, FedoraScheme):
+    """Evaluates the Fedora packages on PowerPC"""
+
+    packages = ["powerpc-utils"]
+
+
+class SuSEPowerPCPackage(Package, Plugin, PowerPCScheme, SuSEScheme):
+    """Evaluates the SuSE packages on PowerPC"""
+
+    packages = ["powerpc-utils"]
+
+
+class UbuntuPowerPCPackage(Package, Plugin, PowerPCScheme, UbuntuScheme):
+    """Evaluates the Ubuntu packages on PowerPC"""
+
+    packages = ["powerpc-ibm-utils"]
 
 
 class PowerNVPackage(Package, Plugin, PowerNVScheme):
