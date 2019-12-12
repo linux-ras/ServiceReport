@@ -44,7 +44,7 @@ def parse_commandline_args(args):
                         dest="list_plugins", default=False,
                         help="list all applicable plugins")
 
-    parser.add_argument("-p" "--plugins", dest="plugins",
+    parser.add_argument("-p", "--plugins", dest="plugins",
                         nargs='+', default=None,
                         help="validates the specified plugins only")
 
