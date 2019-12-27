@@ -129,12 +129,23 @@ class FADump(Dump):
 
         fadump_mem = 0
         for region in fadump_regions.split('\n'):
+            self.log.debug("Fadump region(%s)", region)
+            region = region.strip()
             try:
-                region_size = region[region.find(':')+1 : len(region)].strip().split()[1]
-                fadump_mem = fadump_mem + int(region_size, 16)
-                self.log.debug("Fadump region(%s): size (%s) bytes",
-                               region[0 : region.find(':')],
-                               region_size)
+		if region.startswith("CPU") or region.startswith("HPTE"):
+			region_size = region[region.find(':')+1 : len(region)].strip().split()[1]
+		elif region.startswith("DUMP"):
+			region_list = region.split()
+			if len(region_list) > 6:
+				region_size = region_list[4][:-1]
+			else:
+				region_size = region_list[2]
+		else:
+	                self.log.warning("Unknown Fadump region(%s)", region)
+			continue
+
+		fadump_mem = fadump_mem + int(region_size, 16)
+
             except Exception:
                 self.log.debug("Unable to parse %s", fadump_region_file)
                 return None
