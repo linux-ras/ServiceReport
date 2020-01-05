@@ -56,7 +56,7 @@ class FADump(Dump):
         try:
             if fadump_enabled is None or int(fadump_enabled) != 1:
                 self.log.error("FADump is not enabled")
-                return False
+                status = False
             else:
                 self.log.info("FADump is enabled")
 
