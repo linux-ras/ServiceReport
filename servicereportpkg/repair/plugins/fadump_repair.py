@@ -130,12 +130,12 @@ class FadumpRepair(RepairPlugin):
         else:
             check.set_note(Notes.FAIL_TO_FIX)
 
-    def fix_dump_comp_initrd(self, plugin_obj, check):
+    def fix_dump_comp_initrd(self, plugin_obj, service, check):
         """Restart the dump service"""
 
         command = ["touch", "/etc/sysconfig/kdump"]
         execute_command(command)
-        restart_service(check.get_service())
+        restart_service(service)
         re_check = plugin_obj.check_dump_component_in_initrd()
         if re_check.get_status():
             check.set_status(True)
@@ -211,12 +211,6 @@ class FadumpRepair(RepairPlugin):
             elif fadump_sysconfig_check.get_status() is None:
                 fadump_sysconfig_check.set_note(Notes.FAIL_TO_FIX)
 
-        dump_comp_initrd_check = check_dir["Dump component in initial ramdisk"]
-        if dump_comp_initrd_check.get_status() is False:
-            self.fix_dump_comp_initrd(plugin_obj, dump_comp_initrd_check)
-        elif dump_comp_initrd_check.get_status() is None:
-            dump_comp_initrd_check.set_note(Notes.FAIL_TO_FIX)
-
         fadump_registration_check = check_dir["FADump registration check"]
         if fadump_registration_check.get_status() is False:
             self.fix_fadump_registration_check(plugin_obj, fadump_registration_check)
@@ -228,3 +222,10 @@ class FadumpRepair(RepairPlugin):
             self.fix_service_status(service_status_check)
         elif service_status_check.get_status() is None:
             service_status_check.set_note(Notes.FAIL_TO_FIX)
+
+        dump_comp_initrd_check = check_dir["Dump component in initial ramdisk"]
+        if dump_comp_initrd_check.get_status() is False:
+            self.fix_dump_comp_initrd(plugin_obj, service_status_check.get_service(),
+                                      dump_comp_initrd_check)
+        elif dump_comp_initrd_check.get_status() is None:
+            dump_comp_initrd_check.set_note(Notes.FAIL_TO_FIX)
