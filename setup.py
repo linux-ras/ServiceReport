@@ -20,7 +20,6 @@ setup(packages=find_packages(),
                   ('share/doc/servicereport', ['README.md']),
                   ('/usr/lib/systemd/system',
                    ['service/servicereport.service'])],
-      options = {'bdist_rpm':{'post_install' : 'rpm/postscript'}},
       classifiers=[
           'Development Status :: 4 - Beta',
           'Programming Language :: Python'])
