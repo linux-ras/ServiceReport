@@ -3,8 +3,8 @@ Description=ServiceReport
 Wants=kdump.service
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/servicereport -r
+Type=oneshot
+ExecStart=/usr/bin/servicereport -v
 
 [Install]
 WantedBy=multi-user.target
