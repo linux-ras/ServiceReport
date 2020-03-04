@@ -83,3 +83,29 @@ def generate_report(validation_results, cmd_opts):
     """Generate the report based on the validation results"""
 
     print_report_on_console(validation_results, cmd_opts)
+
+def print_report(validation_results, plugins):
+
+    for plug in plugins:
+        for key in validation_results.keys():
+            if key == plug:
+                plugin_description = validation_results[key][0].get_description()
+                overall_status = True
+                for plugin in validation_results[key]:
+                    if not plugin.get_plugin_status():
+                        overall_status = False
+                        break
+
+                print("{0:52}{1}\n".format(plugin_description,
+                                           get_colored_status_msg(overall_status)))
+
+                for plugin_obj in validation_results[key]:
+                    for check in plugin_obj.checks:
+                        if check.get_note() is None:
+                            print("  {0:50}{1}".format(check.get_name(),
+                                                       get_colored_status_msg(check.get_status())))
+                        else:
+                            print("  {0:50}{1:20}{2}".format(check.get_name(),
+                                                             get_colored_status_msg(check.get_status()),
+                                                             check.get_note()))
+                print('\n')

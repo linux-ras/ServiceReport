@@ -18,6 +18,7 @@ from servicereportpkg.repair import Repair
 from servicereportpkg.validate import Validate
 from servicereportpkg.logger import setup_logger
 from servicereportpkg.report import generate_report
+from servicereportpkg.report import print_report
 from servicereportpkg.global_context import TOOL_NAME
 from servicereportpkg.logger import get_default_logger
 from servicereportpkg.utils import trigger_kernel_crash
@@ -55,6 +56,10 @@ def parse_commandline_args(args):
     parser.add_argument("-r", "--repair", action="store_true",
                         dest="repair", default=False,
                         help="Auto fix the incorrection configurations")
+    parser.add_argument("-rp", "--repair_plugin", dest="repair_plugin",
+                        nargs='+', default=None,
+                        help="fix the incorrection plugin configuration")
+
 
     parser.add_argument("-V", "--version", action="store_true",
                         dest="cmdarg_version", default=False,
@@ -116,7 +121,12 @@ def main():
     if cmd_opts.repair:
         Repair(cmd_opts).repair(validation_results)
         log.debug("Completed the repair.")
-
+    if cmd_opts.repair_plugin:
+        Repair(cmd_opts).repair_plugin(Validate(cmd_opts).validate(),cmd_opts.repair_plugin)
+        validation_results = Validate(cmd_opts).validate()
+        print_report(validation_results, cmd_opts.repair_plugin)
+        log.debug("Completed the repair of plugin/s %s." % cmd_opts.repair_plugin)
+        return 0
     generate_report(validation_results, cmd_opts)
 
     if cmd_opts.dump:
