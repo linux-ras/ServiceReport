@@ -175,7 +175,7 @@ class FADump(Dump):
                                  (8192, 20480),
                                  (16384, 36864),
                                  (32786, 65536),
-                                 (65536, 81920),
+                                 (65536, 131072),
                                  (sys.maxsize, 184320)]
 
         for (sys_mem, mem_reservation_needed) in crashkernel_mem_table:
