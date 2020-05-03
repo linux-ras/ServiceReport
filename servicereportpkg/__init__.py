@@ -48,6 +48,10 @@ def parse_commandline_args(args):
                         nargs='+', default=None,
                         help="validates the specified plugins only")
 
+    parser.add_argument("-o", "--optional", dest="optional",
+                        nargs='+', default=None,
+                        help="run the specified optional plugins")
+
     parser.add_argument("-q", "--quiet", action="store_true",
                         dest="quite", default=False,
                         help="no output on console")
@@ -64,6 +68,11 @@ def parse_commandline_args(args):
                         dest="verbose", default=0,
                         help="increase the logging verbosity")
 
+    parsed_argument = parser.parse_args(args)
+
+    if parsed_argument.plugins and parsed_argument.optional:
+        parser.error("-o(--optional) is not allowed with -p(--pluigns)\n"
+                     "\t\t\tList all the plugins against -p option only.")
     return parser.parse_args(args)
 
 

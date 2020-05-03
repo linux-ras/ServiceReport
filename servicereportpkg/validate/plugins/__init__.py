@@ -16,6 +16,7 @@ class Plugin(object):
     def __init__(self):
         self.name = Plugin.__name__
         self.description = Plugin.__doc__
+        self.optional = False
         self.log = get_default_logger()
         self.checks = []
 
@@ -30,6 +31,11 @@ class Plugin(object):
         the description then the class name will be returned"""
 
         return self.description
+
+    def is_optional(self):
+        """Return True if plugin is optional else False"""
+
+        return self.optional
 
     def get_plugin_status(self):
         """Returns the overall status of the plugin. Returns True only if all
