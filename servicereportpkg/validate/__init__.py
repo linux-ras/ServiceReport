@@ -47,6 +47,9 @@ class Validate(object):
         """Check whether the give plugin is executable in current system
         environment"""
 
+        if self.cmd_opts.all:
+            return True
+
         if self.cmd_opts.plugins:
             return plugin_name in self.cmd_opts.plugins
 

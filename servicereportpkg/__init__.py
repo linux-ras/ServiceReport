@@ -32,6 +32,10 @@ def parse_commandline_args(args):
     parser = ArgumentParser(description="Validation tool to \
                                         verify the system configurations")
 
+    parser.add_argument("-a", "--all", action="store_true",
+                        dest="all", default=False,
+                        help="Execute all plugins applicable to the system")
+
     parser.add_argument("-d", "--dump", action="store_true",
                         dest="dump", default=False,
                         help="Trigger a dump")
@@ -73,6 +77,12 @@ def parse_commandline_args(args):
     if parsed_argument.plugins and parsed_argument.optional:
         parser.error("-o(--optional) is not allowed with -p(--pluigns)\n"
                      "\t\t\tList all the plugins against -p option only.")
+
+    if parsed_argument.all and (parsed_argument.plugins or
+                                parsed_argument.optional):
+        parser.error("-a(--all) option is not allowd with -p(--plugins)\n"
+                     "\t\t\tor -o(--optional) option.")
+
     return parser.parse_args(args)
 
 
