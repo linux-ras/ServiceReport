@@ -22,6 +22,7 @@ class HTX(Plugin, PowerPCScheme):
         Plugin.__init__(self)
         self.name = HTX.__name__
         self.description = HTX.__doc__
+        self.optional = True
         self.service_name = "htxd"
         self.installation_path = "/var/log/htx_install_path"
 
