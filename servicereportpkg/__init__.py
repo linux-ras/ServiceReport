@@ -23,7 +23,7 @@ from servicereportpkg.logger import get_default_logger
 from servicereportpkg.utils import trigger_kernel_crash
 
 
-__version__ = '2.2.1'
+__version__ = '2.2.2'
 
 
 def parse_commandline_args(args):
