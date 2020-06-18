@@ -34,7 +34,20 @@ class FADump(Dump):
         self.description = FADump.__doc__
         self.dump_service_name = "kdump"
         self.dump_comp_name = "kdump"
+        # (system mem, mem reservation needed)
+        # (GB, MB)
         self.log = get_default_logger()
+        self.capture_kernel_mem = [(4, 0),
+                                   (64, 1024),
+                                   (128, 2048),
+                                   (1024, 4096),
+                                   (2048, 6144),
+                                   (4096, 12288),
+                                   (8192, 20480),
+                                   (16384, 36864),
+                                   (32786, 65536),
+                                   (65536, 131072),
+                                   (sys.maxsize, 184320)]
 
     @classmethod
     def is_applicable(cls):
@@ -164,21 +177,7 @@ class FADump(Dump):
         # change from KB to MB
         ram = ram / 1024 / 1024
 
-        # (system mem, mem reservation needed)
-        # (GB, MB)
-        crashkernel_mem_table = [(4, 0),
-                                 (64, 1024),
-                                 (128, 2048),
-                                 (1024, 4096),
-                                 (2048, 6144),
-                                 (4096, 12288),
-                                 (8192, 20480),
-                                 (16384, 36864),
-                                 (32786, 65536),
-                                 (65536, 131072),
-                                 (sys.maxsize, 184320)]
-
-        for (sys_mem, mem_reservation_needed) in crashkernel_mem_table:
+        for (sys_mem, mem_reservation_needed) in self.capture_kernel_mem:
             if ram <= sys_mem:
                 return mem_reservation_needed
 

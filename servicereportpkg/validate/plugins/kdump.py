@@ -121,6 +121,15 @@ class Kdump(Dump):
         self.kdump_etc_conf = "/etc/kdump.conf"
         self.kdump_conf_file = "/etc/sysconfig/kdump"
         self.log = get_default_logger()
+        self.capture_kernel_mem = [(2048, 128),
+                                   (4096, 320),
+                                   (32768, 512),
+                                   (65536, 1024),
+                                   (131072, 2048),
+                                   (1048576, 8192),
+                                   (8388608, 16384),
+                                   (16777216, 32768),
+                                   (sys.maxsize, 65536)]
 
     @classmethod
     def is_applicable(cls):
@@ -143,17 +152,7 @@ class Kdump(Dump):
             # Change from KB to MB
             ram = ram / 1024
 
-        capture_kernel_mem = [(2048, 128),
-                              (4096, 320),
-                              (32768, 512),
-                              (65536, 1024),
-                              (131072, 2048),
-                              (1048576, 8192),
-                              (8388608, 16384),
-                              (16777216, 32768),
-                              (sys.maxsize, 65536)]
-
-        for (total_mem, need_reservation_mem) in capture_kernel_mem:
+        for (total_mem, need_reservation_mem) in self.capture_kernel_mem:
             if ram <= total_mem:
                 return need_reservation_mem
 
@@ -397,6 +396,11 @@ class KdumpRHEL(Kdump, Plugin, RHELScheme):
         self.initial_ramdisk = "/boot/initramfs-" \
                                + self.kernel_release \
                                + "kdump.img"
+        self.capture_kernel_mem = [(4096, 384),
+                                   (16384, 512),
+                                   (65536, 1024),
+                                   (131072, 2048),
+                                   (sys.maxsize, 4096)]
 
 
 class KdumpSuSE(Kdump, Plugin, SuSEScheme):
