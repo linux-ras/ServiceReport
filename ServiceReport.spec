@@ -43,6 +43,7 @@ systemctl enable servicereport.service
 %defattr(-,root,root)
 %doc /usr/share/man/man8/*
 %doc /usr/share/doc/*
+%doc /usr/share/licenses/*
 /usr/lib/*
 /usr/bin/*
 
