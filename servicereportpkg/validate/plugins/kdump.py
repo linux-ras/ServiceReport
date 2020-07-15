@@ -18,6 +18,7 @@ from servicereportpkg.utils import get_file_content, get_total_ram
 from servicereportpkg.utils import get_file_size, is_string_in_file
 from servicereportpkg.check import PackageCheck, ServiceCheck, Check
 from servicereportpkg.check import SysfsCheck, ConfigurationFileCheck
+from servicereportpkg.check import FileCheck
 from servicereportpkg.utils import get_service_status, execute_command
 from servicereportpkg.validate.schemes.schemes import FedoraScheme, SuSEScheme
 from servicereportpkg.validate.schemes.schemes import RHELScheme, UbuntuScheme
@@ -32,6 +33,7 @@ class Dump(object):
         self.initial_ramdisk = ""
         self.log = get_default_logger()
         self.kernel_release = platform.release()
+        self.active_dump = "/proc/vmcore"
 
     def check_is_dump_service_active(self):
         """Service status"""
@@ -98,6 +100,13 @@ class Dump(object):
 
         return PackageCheck(self.check_kexec_package.__doc__,
                             package, status)
+
+    def check_active_dump(self):
+        """Active dump"""
+
+        status = not os.path.isfile(self.active_dump)
+        return FileCheck(self.check_active_dump.__doc__,
+                         self.active_dump, status)
 
 
 class Kdump(Dump):

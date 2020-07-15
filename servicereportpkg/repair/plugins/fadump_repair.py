@@ -229,3 +229,9 @@ class FadumpRepair(RepairPlugin):
                                       dump_comp_initrd_check)
         elif dump_comp_initrd_check.get_status() is None:
             dump_comp_initrd_check.set_note(Notes.FAIL_TO_FIX)
+
+        active_dump = check_dir["Active dump"]
+        if active_dump.get_status() is False:
+            active_dump.add_note("Active dump found, needs reboot")
+        if active_dump.get_status() is None:
+            active_dump.add_note(Notes.FAIL_TO_FIX)

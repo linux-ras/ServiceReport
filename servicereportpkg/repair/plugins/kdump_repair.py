@@ -320,3 +320,9 @@ class KdumpRepair(DumpRepair, RepairPlugin):
                                                           init_ramdisk_comp)
             elif init_ramdisk_comp.get_status() is None:
                 init_ramdisk_comp.set_note(Notes.FAIL_TO_FIX)
+
+        active_dump = check_dir["Active dump"]
+        if active_dump.get_status() is False:
+            active_dump.add_note("Active dump found, needs reboot")
+        if active_dump.get_status() is None:
+            active_dump.add_note(Notes.FAIL_TO_FIX)
