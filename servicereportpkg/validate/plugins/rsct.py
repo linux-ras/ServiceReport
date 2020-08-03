@@ -6,16 +6,13 @@
 """Plugin to check RSCT configuration"""
 
 import os
-import sys
 
-from servicereportpkg.check import Check, SysfsCheck
+from servicereportpkg.check import Check
 from servicereportpkg.validate.plugins import Plugin
 from servicereportpkg.utils import execute_command
 from servicereportpkg.check import PackageCheck, ServiceCheck
 from servicereportpkg.utils import is_package_installed
-from servicereportpkg.logger import get_default_logger
 from servicereportpkg.validate.schemes.schemes import PSeriesScheme
-
 
 class RSCT(Plugin, PSeriesScheme):
 
@@ -25,7 +22,6 @@ class RSCT(Plugin, PSeriesScheme):
         Plugin.__init__(self)
         self.name = RSCT.__name__
         self.description = RSCT.__doc__
-        self.service_name = "ctrmc"
         self.installation_path = "/opt/rsct/bin"
         self.packages = [
             "rsct.core",
@@ -35,10 +31,8 @@ class RSCT(Plugin, PSeriesScheme):
             "devices.chrp.base.ServiceRM",
             "DynamicRM",
             ]
-        self.power_repo_package = "ibm-power-repo"
         self.subsystems = ["ctrmc", "IBM.DRM", "IBM.HostRM",
                            "IBM.ServiceRM", "IBM.MgmtDomainRM"]
-        self.subsystem_active = "active"
 
     def check_rsct_installation_path(self):
         """RSCT Installation path"""
@@ -54,13 +48,13 @@ class RSCT(Plugin, PSeriesScheme):
                      installation_path_exists)
 
     def get_subsystem_status(self, subsystem):
-        """Checks the subsystem status by issuing the lssrc command"""
+        """Checks the subsystem status"""
 
         command = ["lssrc", "-s", subsystem]
         (return_code, stdout, err) = execute_command(command)
 
-        if return_code is None or self.subsystem_active \
-            not in str(stdout):
+        if return_code is None or ("active" not in str(stdout)):
+            self.log.info("Subsystem %s error %s", subsystem, str(err))
             return False
 
         return True
@@ -107,11 +101,11 @@ class RSCT(Plugin, PSeriesScheme):
         """IBM Power Repo Package check"""
 
         status = True
+        power_repo_package = "ibm-power-repo"
         self.log.info("ibm-power-repo Package check")
-        if not is_package_installed(self.power_repo_package):
-            self.log.error("%s package is not installed",
-                           self.power_repo_package)
+        if not is_package_installed(power_repo_package):
+            self.log.error("ibm-power-repo package is not installed")
             status = False
 
         return PackageCheck(self.check_rsct_ibm_power_repo_package_check.__doc__,
-                            self.power_repo_package, status)
+                            power_repo_package, status)
