@@ -151,3 +151,4 @@ class Notes(object):
     FAIL_TO_FIX = "Unable to Fix"
     NOT_FIXABLE = "Not Auto-Fixable"
     FIXED_NEED_REBOOT = "Auto Fixed, Needs Reboot"
+    MANUAL_FIX = "Manual Fix Needed"
