@@ -59,6 +59,10 @@ make install
 
 ### Running
 
+NOTE: servicereport by default runs with python3, if you want to run
+      servicereport with python2 consider chaging the shebang in servicereport
+      script to python2.
+
 Runs and print the status of all the applicable plugins in current system
 ```
 $ servicereport

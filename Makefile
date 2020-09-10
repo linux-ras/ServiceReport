@@ -3,19 +3,21 @@
 # (C) Copyright IBM Corp. 2018, 2019
 # Author: Sourabh Jain <sourabhjain@linux.ibm.com>
 
+PYTHON:=python3
+
 
 # build everything needed to install
 build:
-	python setup.py build
+	$(PYTHON) setup.py build
 
 # install everything from build directory
 install:
-	python setup.py install
+	$(PYTHON) setup.py install
 
 # build the rpm package
 build_rpm:
-	python setup.py bdist_rpm
+	$(PYTHON) setup.py bdist_rpm
 
 # clean up temporary files from 'build' command
 clean:
-	python setup.py clean --all
+	$(PYTHON) setup.py clean --all
