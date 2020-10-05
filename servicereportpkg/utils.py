@@ -293,7 +293,7 @@ def install_package(package):
     log = get_default_logger()
 
     if package_manager is None:
-        log.walk_packages("Unable to locate the package manager")
+        log.warning("Unable to locate the package manager")
         return None
 
     command = package_manager["installer"]+" "+package_manager["install_option"]+" "+package
