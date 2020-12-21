@@ -23,7 +23,7 @@ class HTX(Plugin, PowerPCScheme):
         self.name = HTX.__name__
         self.description = HTX.__doc__
         self.optional = True
-        self.service_name = "htxd"
+        self.service_name = "htx.d"
         self.installation_path = "/var/log/htx_install_path"
 
     def check_htx_installation_path(self):
