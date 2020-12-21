@@ -412,6 +412,16 @@ class KdumpSuSE(Kdump, Plugin, SuSEScheme):
         self.initial_ramdisk = "/boot/initrd-" \
                                + self.kernel_release \
                                + "-kdump"
+        self.capture_kernel_mem = [(32768, 512),
+                                   (65536, 1024),
+                                   (131072, 2048),
+                                   (1048576, 4096),
+                                   (2097152, 6144),
+                                   (4194304, 12288),
+                                   (8388608, 20480),
+                                   (16777216, 32768),
+                                   (sys.maxsize, 65536)]
+
 
     def check_kdump_package(self):
         """kdump package"""
