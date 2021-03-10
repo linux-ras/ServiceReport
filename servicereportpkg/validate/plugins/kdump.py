@@ -10,6 +10,7 @@
 import os
 import sys
 import platform
+import subprocess
 
 from servicereportpkg.utils import is_package_installed
 from servicereportpkg.validate.plugins import Plugin
@@ -148,9 +149,9 @@ class Kdump(Dump):
 
         if ram is None:
             return None
-        else:
-            # Change from KB to MB
-            ram = ram / 1024
+
+        # Change from KB to MB
+        ram = ram / 1024
 
         for (total_mem, need_reservation_mem) in self.capture_kernel_mem:
             if ram <= total_mem:
@@ -376,6 +377,42 @@ class Kdump(Dump):
         return etc_config_check
 
 
+def get_crashkernel_recomm():
+    """Extract crashkernel value from kdump-lib.sh script"""
+
+    kdump_lib_path = ". /lib/kdump/kdump-lib.sh; kdump_get_arch_recommend_size"
+    crash_value_cmd = ['bash', '-c', kdump_lib_path]
+    crash_ker_val = -1
+
+    # check if we can get crashkernel recommandation from kdump-lib.sh
+    try:
+        proc = subprocess.Popen(crash_value_cmd, stdout=subprocess.PIPE,
+                                stdin=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        crash_value = proc.stdout.read().decode('ascii')[:-1]
+        # expecting crashkernel value in xx[M|MB|G|GB|T|TB] format
+        if len(crash_value) > 1:
+            unit = ""
+            crash_value_tmp = ""
+            for ele in crash_value:
+                if ele.isdigit():
+                    crash_value_tmp = crash_value_tmp+ele
+                else:
+                    unit = ele
+                    break
+            crash_value = int(crash_value_tmp)
+            if unit in 'G' or unit in 'g':
+                crash_value = crash_value * 1024
+            elif unit in 'T' or unit in 't':
+                crash_value = crash_value * 1024 * 1024
+
+            crash_ker_val = crash_value
+
+    except Exception as e:
+        crash_ker_val = -1
+
+    return crash_ker_val
+
 class KdumpFedora(Kdump, Plugin, FedoraScheme):
     """Validates the Kdump configuration on Fedora"""
 
@@ -385,6 +422,26 @@ class KdumpFedora(Kdump, Plugin, FedoraScheme):
         self.initial_ramdisk = "/boot/initramfs-" \
                                + self.kernel_release \
                                + "kdump.img"
+
+    def get_required_mem_for_capture_kernel(self):
+        """detects the system configuration and returns the amount of memory
+        required for capture kernel in MB"""
+
+        crash_ker_val = get_crashkernel_recomm()
+        if crash_ker_val != -1:
+            return crash_ker_val
+
+        ram = get_total_ram()
+
+        if ram is None:
+            return None
+
+        # change from kb to mb
+        ram = ram / 1024
+
+        for (total_mem, need_reservation_mem) in self.capture_kernel_mem:
+            if ram <= total_mem:
+                return need_reservation_mem
 
 
 class KdumpRHEL(Kdump, Plugin, RHELScheme):
@@ -401,6 +458,26 @@ class KdumpRHEL(Kdump, Plugin, RHELScheme):
                                    (65536, 1024),
                                    (131072, 2048),
                                    (sys.maxsize, 4096)]
+
+    def get_required_mem_for_capture_kernel(self):
+        """detects the system configuration and returns the amount of memory
+        required for capture kernel in MB"""
+
+        crash_ker_val = get_crashkernel_recomm()
+        if crash_ker_val != -1:
+            return crash_ker_val
+
+        ram = get_total_ram()
+
+        if ram is None:
+            return None
+
+        # change from kb to mb
+        ram = ram / 1024
+
+        for (total_mem, need_reservation_mem) in self.capture_kernel_mem:
+            if ram <= total_mem:
+                return need_reservation_mem
 
 
 class KdumpSuSE(Kdump, Plugin, SuSEScheme):
