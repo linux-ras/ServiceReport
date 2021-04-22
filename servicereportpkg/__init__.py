@@ -12,6 +12,7 @@ check during validation."""
 import os
 import sys
 import time
+import platform
 from argparse import ArgumentParser
 
 from servicereportpkg.repair import Repair
@@ -21,6 +22,7 @@ from servicereportpkg.report import generate_report
 from servicereportpkg.global_context import TOOL_NAME
 from servicereportpkg.logger import get_default_logger
 from servicereportpkg.utils import trigger_kernel_crash
+from servicereportpkg.global_context import SUPPORTED_ARCHS
 
 
 __version__ = '2.2.2'
@@ -104,10 +106,25 @@ def get_dump_plugin(validation_results):
     return None
 
 
+def is_arch_supported():
+    """Returns True if the tool supports current architecture else False"""
+
+    arch = platform.machine().lower()
+    if arch in SUPPORTED_ARCHS:
+        return True
+
+    return False
+
+
 def main():
     """Entry point of ServiceReport tool"""
 
     cmd_opts = parse_commandline_args(sys.argv[1:])
+
+    if not is_arch_supported():
+        print("\nUnsupported Architecure!")
+        return 1
+
     log = setup_logger(cmd_opts.log_file, cmd_opts.verbose)
 
     print(TOOL_NAME + " " + get_version()+"\n")

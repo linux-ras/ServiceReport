@@ -8,3 +8,4 @@ import os
 import sys
 
 TOOL_NAME = os.path.basename(sys.argv[0])
+SUPPORTED_ARCHS = ["ppc64le"]
