@@ -56,14 +56,33 @@ class ServiceCheck(Check):
 class DaemonCheck(Check):
     """Manage daemon check information"""
 
-    def __init__(self, name, daemon, status=None, note=None):
-        Check.__init__(self, name, status, note)
-        self.daemon = daemon
+    def __init__(self, name, status=None, enabled=None,
+                 active=None):
+        """Daemon check initializer"""
 
-    def get_daemon(self):
-        """Returns the daemon name"""
+        Check.__init__(self, name, status)
+        self.enabled = enabled
+        self.active = active
 
-        return self.daemon
+    def set_daemon_enabled(self, enabled):
+        """Set daemon enabled status"""
+
+        self.enabled = enabled
+
+    def is_daemon_enabled(self):
+        """Returns daemon enabled status"""
+
+        return self.enabled
+
+    def set_daemon_active(self, active):
+        """Set daemon active status"""
+
+        self.active = active
+
+    def is_daemon_active(self):
+        """Returns daemon active status"""
+
+        return self.active
 
 
 class PackageCheck(Check):

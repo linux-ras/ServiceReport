@@ -8,6 +8,7 @@
 
 from servicereportpkg.check import DaemonCheck
 from servicereportpkg.utils import is_daemon_enabled
+from servicereportpkg.utils import get_service_status
 from servicereportpkg.validate.plugins import Plugin
 from servicereportpkg.validate.schemes.schemes import PSeriesScheme
 from servicereportpkg.validate.schemes.schemes import BMCPowerNVScheme
@@ -19,20 +20,33 @@ from servicereportpkg.validate.schemes.schemes import UbuntuScheme
 
 
 def generate_daemon_check(self, daemon):
-    """Generates a function that checks the given daemon is enabled or not"""
+    """Generates a function to check daemon status"""
 
     def check():
-        check_daemon = daemon
-        daemon_status = is_daemon_enabled(check_daemon)
+        status = True
+        enabled = is_daemon_enabled(daemon)
 
-        if daemon_status is None:
-            self.log.warning("Unable to find %s daemon status", check_daemon)
-        elif daemon_status is False:
-            self.log.error("%s is not enabled" % check_daemon)
+        if enabled is None:
+            self.log.warning("Unable to find %s daemon status", daemon)
+        elif enabled is False:
+            self.log.error("%s is not enabled" % daemon)
+
+        active = get_service_status(daemon)
+        if active is None or active != 0:
+            self.log.error("%s daemon is not active", daemon)
+            self.log.recommendation("Start the service: systemctl start %s",
+                                    daemon)
+            active = False
         else:
-            self.log.info("%s is enabled" % check_daemon)
+            self.log.info("%s is active" % daemon)
+            active = True
 
-        return DaemonCheck(check_daemon, check_daemon, daemon_status)
+        if enabled is None or active is None:
+            status = None
+        elif enabled is False or active is False:
+            status = False
+
+        return DaemonCheck(daemon, status, enabled, active)
 
     check.__doc__ = "%s" % (daemon)
     return check
