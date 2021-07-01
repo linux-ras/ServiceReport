@@ -25,7 +25,7 @@ from servicereportpkg.utils import trigger_kernel_crash
 from servicereportpkg.global_context import SUPPORTED_ARCHS
 
 
-__version__ = '2.2.2'
+__version__ = '2.2.3'
 
 
 def parse_commandline_args(args):
