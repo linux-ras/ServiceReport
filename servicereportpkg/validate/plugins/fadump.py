@@ -37,16 +37,16 @@ class FADump(Dump):
         # (system mem, mem reservation needed)
         # (GB, MB)
         self.log = get_default_logger()
-        self.capture_kernel_mem = [(4, 0),
-                                   (64, 1024),
-                                   (128, 2048),
-                                   (1024, 4096),
-                                   (2048, 6144),
-                                   (4096, 12288),
-                                   (8192, 20480),
-                                   (16384, 36864),
-                                   (32786, 65536),
-                                   (65536, 131072),
+        self.capture_kernel_mem = [(16384, 786),
+                                   (65536, 1024),
+                                   (131072, 2048),
+                                   (1048576, 4096),
+                                   (2097152, 6144),
+                                   (4194304, 12288),
+                                   (8388608, 20480),
+                                   (16777216, 36864),
+                                   (33554432, 65536),
+                                   (67108864, 131072),
                                    (sys.maxsize, 184320)]
 
     @classmethod
@@ -175,7 +175,7 @@ class FADump(Dump):
             return None
 
         # change from KB to MB
-        ram = ram / 1024 / 1024
+        ram = ram / 1024
 
         for (sys_mem, mem_reservation_needed) in self.capture_kernel_mem:
             if ram <= sys_mem:
@@ -236,15 +236,6 @@ class FADumpSuSE(FADump, Plugin, SuSEScheme, PowerPCScheme):
         FADump.__init__(self)
         self.initial_ramdisk = "/boot/initrd-" \
                                + self.kernel_release
-        self.capture_kernel_mem = [(32768, 512),
-                                   (65536, 1024),
-                                   (131072, 2048),
-                                   (1048576, 4096),
-                                   (2097152, 6144),
-                                   (4194304, 12288),
-                                   (8388608, 20480),
-                                   (16777216, 32768),
-                                   (sys.maxsize, 65536)]
 
     def check_kdump_sysconfig(self):
         """Fadump attributes in /etc/sysconfig/kdump"""
