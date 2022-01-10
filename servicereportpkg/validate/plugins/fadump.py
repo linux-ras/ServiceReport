@@ -33,7 +33,7 @@ class FADump(Dump):
         self.name = FADump.__name__
         self.description = FADump.__doc__
         self.dump_service_name = "kdump"
-        self.dump_comp_name = "kdump"
+        self.dump_comp_name = ["kdump", "zz-fadumpinit"]
         # (system mem, mem reservation needed)
         # (GB, MB)
         self.log = get_default_logger()

@@ -30,7 +30,7 @@ class Dump(object):
 
     def __init__(self):
         self.dump_service_name = ""
-        self.dump_comp_name = ""
+        self.dump_comp_name = []
         self.initial_ramdisk = ""
         self.log = get_default_logger()
         self.kernel_release = platform.release()
@@ -57,7 +57,7 @@ class Dump(object):
     def check_dump_component_in_initrd(self):
         """Dump component in initial ramdisk"""
 
-        status = True
+        status = None
 
         if not os.path.isfile(self.initial_ramdisk):
             self.log.error("Initial ramdisk not found %s",
@@ -77,14 +77,19 @@ class Dump(object):
                                self.dump_comp_name)
                 status = False
 
-            elif self.dump_comp_name not in str(stdout):
-                self.log.error("kdump component is missing in %s",
-                               self.initial_ramdisk)
-                status = False
+            elif self.dump_comp_name:
+                for dump_comp in self.dump_comp_name:
+                    if dump_comp in str(stdout):
+                        status = True;
+                        break
 
-            else:
-                self.log.debug("%s component found in %s", self.dump_comp_name,
+                if status:
+                    self.log.debug("%s component found in %s", self.dump_comp_name,
+                                   self.initial_ramdisk)
+                else:
+                    self.log.error("kdump component is missing in %s",
                                self.initial_ramdisk)
+                    status = False
 
         return Check(self.check_dump_component_in_initrd.__doc__,
                      status)
@@ -118,7 +123,7 @@ class Kdump(Dump):
         self.name = Kdump.__name__
         self.description = Kdump.__doc__
         self.dump_service_name = "kdump"
-        self.dump_comp_name = "kdump"
+        self.dump_comp_name = ["kdump"]
         self.kdump_etc_conf = "/etc/kdump.conf"
         self.kdump_conf_file = "/etc/sysconfig/kdump"
         self.log = get_default_logger()
