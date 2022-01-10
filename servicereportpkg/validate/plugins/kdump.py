@@ -69,7 +69,7 @@ class Dump(object):
             status = False
 
         else:
-            (return_code, stdout) = execute_command(["lsinitrd",
+            (return_code, stdout) = execute_command(["lsinitrd", "-m",
                                                      self.initial_ramdisk])[:-1]
 
             if return_code is None:
