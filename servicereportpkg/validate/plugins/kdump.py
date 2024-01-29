@@ -491,9 +491,8 @@ class KdumpSuSE(Kdump, Plugin, SuSEScheme):
     def __init__(self):
         Plugin.__init__(self)
         Kdump.__init__(self)
-        self.initial_ramdisk = "/boot/initrd-" \
-                               + self.kernel_release \
-                               + "-kdump"
+        self.initial_ramdisk_list = ["/boot/initrd-" + self.kernel_release + "-kdump",
+                                     "/var/lib/kdump/initrd"]
         self.capture_kernel_mem = [(32768, 512),
                                    (65536, 1024),
                                    (131072, 2048),
@@ -504,6 +503,32 @@ class KdumpSuSE(Kdump, Plugin, SuSEScheme):
                                    (16777216, 32768),
                                    (sys.maxsize, 65536)]
 
+    def check_dump_component_in_initrd(self):
+        """Dump component in initial ramdisk"""
+
+        status = False
+        for initrd in self.initial_ramdisk_list:
+
+            if not os.path.isfile(initrd):
+                continue
+
+            if get_file_size(initrd) < 1:
+                continue
+
+            (return_code, stdout) = execute_command(["lsinitrd", initrd])[:-1]
+
+            if return_code is None:
+                continue
+
+            if self.dump_comp_name not in str(stdout):
+                continue
+
+            status = True
+            self.log.debug("%s component found in %s", self.dump_comp_name, initrd)
+            break
+
+        return Check(self.check_dump_component_in_initrd.__doc__,
+                     status)
 
     def check_kdump_package(self):
         """kdump package"""
