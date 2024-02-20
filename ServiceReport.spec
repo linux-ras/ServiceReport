@@ -1,5 +1,5 @@
 %define name ServiceReport
-%define version 2.2.1
+%define version 2.2.4
 %define release 1
 
 # By default python 3 is used to build the package.
