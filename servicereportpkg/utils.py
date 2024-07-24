@@ -48,12 +48,11 @@ def get_package_classes(pkg_path, prefix):
     return pkg_classes
 
 
-def get_distro_name():
+def get_distro_name(distro_search_key = 'PRETTY_NAME'):
     """Finds the distro name from /etc/os-release and on success returns
     the distro name else empty string"""
 
     os_release = '/etc/os-release'
-    distro_search_key = 'PRETTY_NAME'
     log = get_default_logger()
 
     try:
@@ -135,7 +134,7 @@ def execute_command(command, sh=False):
 def find_package_manager():
     """Returns the package manager supported in the current system"""
 
-    distro = get_distro_name()
+    distro = get_distro_name('PRETTY_NAME')
     package_manager_options = \
         {"Fedora": {"command": "rpm", "search_option": "-qi",
                     "installer": "yum", "install_option": "install -y"},
@@ -343,7 +342,14 @@ def restart_service(service):
 
 
 def update_grub():
+    version = eval(get_distro_name('VERSION_ID').split()[0])
+    distro_name = get_distro_name('PRETTY_NAME').strip("")
     command = ["grub2-mkconfig", "-o", "/boot/grub2/grub.cfg"]
+    # Check if the distribution is RHEL and the version is 9.3 or greater
+    if "Red Hat" in distro_name:
+        major_version, minor_version = map(int, version.split('.'))
+        if (major_version == 9 and minor_version >= 3) or major_version > 9:
+            command = ["grub2-mkconfig", "-o", "/boot/grub2/grub.cfg", "--update-bls-cmdline"]
 
     return_code = execute_command(command)[0]
     if return_code == 0:

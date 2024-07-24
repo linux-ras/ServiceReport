@@ -12,7 +12,7 @@ from servicereportpkg.validate.schemes import Scheme
 from servicereportpkg.utils import get_service_processor
 from servicereportpkg.utils import get_distro_name, get_system_platform
 
-DISTRO = get_distro_name()
+DISTRO = get_distro_name(distro_search_key = 'PRETTY_NAME')
 
 
 class RHELScheme(Scheme):
