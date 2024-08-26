@@ -342,8 +342,26 @@ def restart_service(service):
     return False
 
 
+def is_update_bls_supported():
+    """Returns True if grub2-mkconfig command support update
+    bls support, False otherwise"""
+
+    (stdout) = execute_command(["grub2-mkconfig", "-h"])[1]
+
+    if stdout is None:
+        return False
+
+    if "update-bls-cmdline" in stdout:
+        return True
+
+    return False
+
+
 def update_grub():
     command = ["grub2-mkconfig", "-o", "/boot/grub2/grub.cfg"]
+
+    if is_update_bls_supported():
+        command.append("--update-bls-cmdline")
 
     return_code = execute_command(command)[0]
     if return_code == 0:
