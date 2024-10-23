@@ -4,6 +4,17 @@ After=kdump.service
 DefaultDependencies=no
 
 [Service]
+# added automatically, for details please see
+# https://en.opensuse.org/openSUSE:Security_Features#Systemd_hardening_effort
+ProtectSystem=full
+ProtectHome=true
+PrivateDevices=true
+ProtectHostname=true
+ProtectClock=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
 Type=oneshot
 ExecStart=/usr/bin/servicereport -v
 RemainAfterExit=yes
