@@ -20,7 +20,9 @@ BuildArch: ppc64le
 Vendor: IBM Corp.
 BuildRequires: %{python} systemd
 BuildRequires: %{python}-setuptools
+BuildRequires: %{python}-devel
 Requires: %{python} systemd
+Requires: %{python}-pyudev
 
 %description
 ServiceReport is a python based tool that investigates the incorrect First Failure Data
@@ -35,6 +37,8 @@ Capture (FFDC) configuration and optionally repairs the incorrect configuration
 
 %install
 %{python} setup.py install --root=$RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/%{python3_sitelib}/sos/report/plugins
+install -m 644 sos-plugin/spyre-external.py $RPM_BUILD_ROOT/%{python3_sitelib}/sos/report/plugins
 
 %post
 systemctl enable servicereport.service
