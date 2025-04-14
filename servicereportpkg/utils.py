@@ -7,6 +7,7 @@
 
 
 import os
+import stat
 import inspect
 import pkgutil
 import importlib
@@ -371,3 +372,34 @@ def update_grub():
         return True
 
     return False
+
+
+def is_read_write_to_all_users(file_path):
+    """
+    Check if a file has read and write permissions for owner,
+    group, and others.
+
+    Args:
+        file_path (str): The full path to the file.
+
+    Returns:
+        bool: True if all users (owner, group, others) have both read and write
+              permissions, False otherwise. Also returns False if the file does
+              not exist.
+    """
+
+    log = get_default_logger()
+
+    try:
+        mode = os.stat(file_path).st_mode
+        return (
+            bool(mode & stat.S_IROTH) and  # Read permission for others
+            bool(mode & stat.S_IWOTH) and  # Write permission for others
+            bool(mode & stat.S_IRUSR) and  # Read permission for owner
+            bool(mode & stat.S_IWUSR) and  # Write permission for owner
+            bool(mode & stat.S_IRGRP) and  # Read permission for group
+            bool(mode & stat.S_IWGRP)      # Write permission for group
+        )
+    except FileNotFoundError:
+        log.debug("File %s not found.", file_path)
+        return False
