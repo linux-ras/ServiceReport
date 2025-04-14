@@ -111,6 +111,24 @@ class FileCheck(Check):
         return self.file_path
 
 
+class FilesCheck(Check):
+    """Manage files check information"""
+
+    def __init__(self, name, status=None, note=None):
+        Check.__init__(self, name, status, note)
+        self.files = {}
+
+    def add_file(self, file_path, status):
+        """Add a file to files dic"""
+
+        self.files[file_path] = status
+
+    def get_files(self):
+        """Returns the files"""
+
+        return self.files
+
+
 class SysfsCheck(FileCheck):
     """Manage sysfs file check information"""
 
@@ -160,6 +178,24 @@ class ConfigurationFileCheck(FileCheck):
         self.config_attributes[attribute] = {"status": is_config_correct,
                                              "current_value": configured_value,
                                              "possible_values": possible_values}
+
+
+class ConfigCheck(Check):
+    """General system configuration check"""
+
+    def __init__(self, name, status=None, note=None):
+        Check.__init__(self, name, status, note)
+        self.configs = []
+
+    def get_configs_list(self):
+        """Returns the config as list of tuple (config, bool)"""
+
+        return self.configs
+
+    def add_config(self, config, is_present):
+        """Add config to the list"""
+
+        self.configs.append((config, is_present))
 
 
 class Notes(object):
