@@ -76,6 +76,11 @@ def print_report_on_console(validation_results, cmd_opts):
                     print("  {0:50}{1:20}{2}".format(check.get_name(),
                                                      get_colored_status_msg(check.get_status()),
                                                      check.get_note()))
+
+            for check in plugin_obj.checks:
+                message = check.get_message()
+                if message is not None:
+                    print(message)
         print('\n')
 
 
