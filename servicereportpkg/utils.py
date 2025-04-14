@@ -403,3 +403,18 @@ def is_read_write_to_all_users(file_path):
     except FileNotFoundError:
         log.debug("File %s not found.", file_path)
         return False
+
+
+def append_to_file(file_path, s):
+    """Append the given stirng to the file"""
+
+    log = get_default_logger()
+
+    try:
+        with open(file_path, "a", encoding="utf-8") as file:
+            file.write(s)
+
+        return True
+    except Exception as e:
+        log.debug("Failed to open file: %s, error: %s", file_path, e)
+        return False

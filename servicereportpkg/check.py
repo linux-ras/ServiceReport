@@ -9,10 +9,11 @@
 class Check(object):
     """A check performed in a plugin is stored as a Check class instance"""
 
-    def __init__(self, name, status=None, note=None):
+    def __init__(self, name, status=None, note=None, message=None):
         self.name = name
         self.status = status
         self.note = note
+        self.message = message
 
     def get_name(self):
         """Return the check name"""
@@ -38,6 +39,16 @@ class Check(object):
         """Set the check note"""
 
         self.note = note
+
+    def get_message(self):
+        """Return the check message"""
+
+        return self.message
+
+    def set_message(self, message):
+        """Set the check message"""
+
+        self.message = message
 
 
 class ServiceCheck(Check):
