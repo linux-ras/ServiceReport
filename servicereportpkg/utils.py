@@ -59,6 +59,9 @@ def get_distro_name():
     try:
         with open(os_release, 'r') as _file:
             for line in _file:
+                if line.startswith('#'):
+                    continue
+
                 (key, value) = line.split("=")
                 if key.startswith(distro_search_key):
                     return value.strip()
