@@ -15,7 +15,6 @@ ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectKernelLogs=true
 ProtectControlGroups=true
-Type=oneshot
 ExecStart=/usr/bin/servicereport -v
 RemainAfterExit=yes
 
