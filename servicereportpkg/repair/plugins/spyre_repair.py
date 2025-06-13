@@ -8,10 +8,13 @@
 
 import os
 import stat
+import re
+import shutil
 
 from servicereportpkg.check import Notes
 from servicereportpkg.utils import append_to_file
 from servicereportpkg.utils import execute_command
+from servicereportpkg.utils import install_package
 from servicereportpkg.repair.plugins import RepairPlugin
 
 
@@ -130,6 +133,114 @@ class SpyreRepair(RepairPlugin):
         else:
             vfio_device_permission_check.set_note(Notes.FAIL_TO_FIX)
 
+    def fix_sos_package(self, plugin_obj, sos_package_check):
+        """install sos package"""
+
+        install_package(sos_package_check.get_package_name())
+        re_check = plugin_obj.check_sos_package()
+        if re_check.get_status():
+            sos_package_check.set_status(True)
+            sos_package_check.set_note(Notes.FIXED)
+        else:
+            sos_package_check.set_note(Notes.FAIL_TO_FIX)
+
+    def fix_sos_config(self, plugin_obj, sos_config_check):
+        """Update sos config"""
+
+        sos_config_file = sos_config_check.get_file_path()
+        try:
+            with open(sos_config_file, 'r', encoding="utf-8") as f:
+                lines = f.readlines()
+
+        except (FileNotFoundError, PermissionError) as e:
+            self.log.error("Error reading file %s: %s", sos_config_file, str(e))
+            sos_config_check.set_note(Notes.FAIL_TO_FIX)
+            return
+
+            # Normalize for detection (but preserve original lines for writing)
+        pattern_logs = re.compile(r'^\s*podman\.logs\s*=\s*true\s*$', re.IGNORECASE)
+        pattern_all = re.compile(r'^\s*podman\.all\s*=\s*true\s*$', re.IGNORECASE)
+        section_pattern = re.compile(r'^\s*\[\s*plugin_options\s*\]\s*$')
+
+        in_plugin_options = False
+        found_plugin_section = False
+        podman_logs_present = False
+        podman_all_present = False
+        updated_lines = []
+
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+
+            # Detect start of [plugin_options] section
+            if section_pattern.match(stripped):
+                in_plugin_options = True
+                found_plugin_section = True
+                updated_lines.append(line)
+                continue
+
+            # Detect other sections, stop plugin_options scope
+            if in_plugin_options and re.match(r'^\s*\[.*\]\s*$', stripped):
+                in_plugin_options = False
+
+            # Inside [plugin_options] section
+            if in_plugin_options:
+                if pattern_logs.match(stripped):
+                    podman_logs_present = True
+                if pattern_all.match(stripped):
+                    podman_all_present = True
+
+            updated_lines.append(line)
+
+        # Append missing section and/or options
+        if not found_plugin_section:
+            updated_lines.append('\n[plugin_options]\n')
+            updated_lines.append('podman.logs = true\n')
+            updated_lines.append('podman.all = true\n')
+        else:
+            # Add missing entries at the end of [plugin_options]
+            insert_index = None
+            for i in range(len(updated_lines)):
+                if section_pattern.match(updated_lines[i].strip()):
+                    insert_index = i + 1
+                    break
+
+            # Move to the point just before the next section or EOF
+            while insert_index < len(updated_lines):
+                if re.match(r'^\s*\[.*\]\s*$', updated_lines[insert_index].strip()):
+                    break
+                insert_index += 1
+
+            if not podman_logs_present:
+                updated_lines.insert(insert_index, 'podman.logs = true\n')
+                insert_index += 1
+            if not podman_all_present:
+                updated_lines.insert(insert_index, 'podman.all = true\n')
+
+        # Backup original file
+        try:
+            shutil.copy(sos_config_file, sos_config_file + ".bak")
+        except Exception as e:
+            self.log.error("Error backing up %s: %s", sos_config_file, str(e))
+            sos_config_check.set_note(Notes.FAIL_TO_FIX)
+            return
+
+        # Write the updated config
+        try:
+            with open(sos_config_file, 'w', encoding="utf-8") as f:
+                f.writelines(updated_lines)
+
+        except (PermissionError, OSError) as e:
+            self.log.error("Error writing to file %s : %s",
+                           sos_config_file, str(e))
+            return
+
+        re_check = plugin_obj.check_sos_config()
+        if re_check.get_status():
+            sos_config_check.set_status(True)
+            sos_config_check.set_note(Notes.FIXED)
+        else:
+            sos_config_check.set_note(Notes.FAIL_TO_FIX)
+
     def repair(self, plugin_obj, checks):
         """Repair spyre checks"""
 
@@ -190,3 +301,18 @@ class SpyreRepair(RepairPlugin):
             self.fix_vfio_perm_check(plugin_obj, vfio_device_permission_check)
         elif vfio_device_permission_check.get_status() is None:
             vfio_device_permission_check.set_note(Notes.NOT_FIXABLE)
+
+        sos_package_check = check_dir["sos package"]
+        if sos_package_check.get_status() is False:
+            self.fix_sos_package(plugin_obj, sos_package_check)
+        elif sos_package_check.get_status is None:
+            sos_package_check.set_note(Notes.NOT_FIXABLE)
+
+        sos_config_check = check_dir["sos config"]
+        # if sos package is not intalled, not much can be done
+        if not sos_package_check.get_status():
+            sos_config_check.set_note(Notes.NOT_FIXABLE)
+        elif sos_config_check.get_status() is False:
+            self.fix_sos_config(plugin_obj, sos_config_check)
+        elif sos_config_check.get_status is None:
+            sos_config_check.set_note(Notes.NOT_FIXABLE)

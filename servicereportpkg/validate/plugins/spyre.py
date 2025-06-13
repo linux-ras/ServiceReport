@@ -12,9 +12,11 @@ import pyudev
 
 from servicereportpkg.utils import execute_command
 from servicereportpkg.check import Check, ConfigCheck
+from servicereportpkg.check import PackageCheck
 from servicereportpkg.validate.schemes import Scheme
 from servicereportpkg.validate.plugins import Plugin
 from servicereportpkg.check import FilesCheck
+from servicereportpkg.utils import is_package_installed
 from servicereportpkg.check import ConfigurationFileCheck
 from servicereportpkg.utils import is_read_write_to_all_users
 
@@ -262,3 +264,69 @@ class Spyre(Plugin, Scheme):
 
         perm_check.set_status(status)
         return perm_check
+
+    def check_sos_package(self):
+        """sos package"""
+
+        status = True
+        package = "sos"
+
+        if not is_package_installed(package):
+            self.log.error("%s package is not installed", package)
+            status = False
+
+        return PackageCheck(self.check_sos_package.__doc__,
+                            package, status)
+
+    def check_sos_config(self):
+        "sos config"
+
+        status = True
+        sos_config_file = "/etc/sos/sos.conf"
+        sos_config = {"podman.logs": False,
+                      "podman.all": False,
+                       }
+
+        sos_config_check = ConfigurationFileCheck(self.check_sos_config.__doc__,
+                                            sos_config_file)
+
+        # Patterns to match podman.logs = true and podman.all = true
+        pattern_logs = re.compile(r'^\s*podman\.logs\s*=\s*true\s*$', re.IGNORECASE)
+        pattern_all = re.compile(r'^\s*podman\.all\s*=\s*true\s*$', re.IGNORECASE)
+
+        try:
+            with open(sos_config_file, 'r', encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+
+                    # Skip comments and empty lines
+                    if not line or line.startswith('#'):
+                        continue
+
+                    # Detect section headers
+                    if line.startswith('[') and line.endswith(']'):
+                        section = line[1:-1].strip()
+                        if section == "plugin_options":
+                            in_plugin_options = True
+                        else:
+                            in_plugin_options = False
+                        continue
+
+                    if in_plugin_options:
+                        if pattern_logs.match(line):
+                            sos_config["podman.logs"] = True
+                        elif pattern_all.match(line):
+                            sos_config["podman.all"] = True
+
+            for key, value in sos_config.items():
+                if not value:
+                    status = False
+                sos_config_check.add_attribute(key, value, None, None)
+
+        except (FileNotFoundError, PermissionError) as e:
+            status = False
+            self.log.error("Error reading file %s: %s", sos_config_file,
+                           str(e))
+
+        sos_config_check.set_status(status)
+        return sos_config_check
