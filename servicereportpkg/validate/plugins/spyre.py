@@ -217,7 +217,7 @@ class Spyre(Plugin, Scheme):
     def check_vfio_module(self):
         """VFIO kernel module loaded"""
 
-        module_name = "vfio"
+        module_name = "vfio_pci"
         module_check = Check(self.check_vfio_module.__doc__)
         (rc, stdout, _err) = execute_command(["lsmod"])
         status = False
