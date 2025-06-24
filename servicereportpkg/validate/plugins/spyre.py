@@ -124,13 +124,13 @@ class Spyre(Plugin, Scheme):
         conf_check.set_status(status)
         return conf_check
 
-    def check_memblock_conf(self):
-        """User memblock configuration"""
+    def check_memlock_conf(self):
+        """User memlock configuration"""
 
         vfio_mem_conf = ["@sentient - memlock 134217728"]
         config_file = "/etc/security/limits.d/memlock.conf"
 
-        conf_check = ConfigurationFileCheck(self.check_memblock_conf.__doc__,
+        conf_check = ConfigurationFileCheck(self.check_memlock_conf.__doc__,
                                             config_file)
 
         status = True

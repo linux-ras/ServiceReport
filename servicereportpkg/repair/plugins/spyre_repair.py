@@ -46,7 +46,7 @@ class SpyreRepair(RepairPlugin):
                 append_to_file(user_mem_conf_check.get_file_path(),
                                "\n"+config)
 
-        re_check = plugin_obj.check_memblock_conf()
+        re_check = plugin_obj.check_memlock_conf()
         if re_check.get_status():
             user_mem_conf_check.set_status(True)
             user_mem_conf_check.set_note(Notes.FIXED)
@@ -133,8 +133,8 @@ class SpyreRepair(RepairPlugin):
     def repair(self, plugin_obj, checks):
         """Repair spyre checks"""
 
-        memblock_limit_message = \
-            ("\nMemblock limit is set for the sentient group.\n"
+        memlock_limit_message = \
+            ("\nMemlock limit is set for the sentient group.\n"
             "Spyre user must be in the sentient group.\n"
             "To add run below command:\n"
             "\tsudo usermod -aG sentient <user>\n"
@@ -152,7 +152,7 @@ class SpyreRepair(RepairPlugin):
         elif vfio_drive_config_check.get_status() is None:
             vfio_drive_config_check.set_note(Notes.FAIL_TO_FIX)
 
-        user_mem_conf_check = check_dir["User memblock configuration"]
+        user_mem_conf_check = check_dir["User memlock configuration"]
         if user_mem_conf_check.get_status() is False:
             self.fix_user_mem_conf(plugin_obj, user_mem_conf_check)
         elif user_mem_conf_check.get_status() is None:
@@ -177,7 +177,7 @@ class SpyreRepair(RepairPlugin):
             user_group_conf_check.set_note(Notes.FAIL_TO_FIX)
 
         if user_group_conf_check.get_status() and user_mem_conf_check.get_status():
-            user_mem_conf_check.set_message(memblock_limit_message)
+            user_mem_conf_check.set_message(memlock_limit_message)
 
         vfio_kernel_mod_check = check_dir["VFIO kernel module loaded"]
         if vfio_kernel_mod_check.get_status() is False:
