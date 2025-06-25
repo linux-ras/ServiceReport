@@ -38,6 +38,7 @@ Capture (FFDC) configuration and optionally repairs the incorrect configuration
 
 %post
 systemctl enable servicereport.service
+systemctl start servicereport.service
 
 %files
 %defattr(-,root,root)
