@@ -53,6 +53,11 @@ class SpyreExternal(Plugin, IndependentPlugin):
             "lsslot -c phb",
         ])
 
+        self.add_cmd_output([
+            "podman system df",
+            "podman system df -v",
+            ])
+
     def get_spyre_cards(self):
         context = pyudev.Context()
         spyre_cards_bus_ids = []
