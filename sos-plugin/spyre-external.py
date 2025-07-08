@@ -58,6 +58,12 @@ class SpyreExternal(Plugin, IndependentPlugin):
             "podman system df -v",
             ])
 
+        self.add_copy_spec([
+            "/etc/modprobe.d/vfio-pci.conf",
+            "/etc/udev/rules.d/95-vfio-3.rules",
+            "/etc/security/limits.d/memlock.conf",
+        ])
+
     def get_spyre_cards(self):
         context = pyudev.Context()
         spyre_cards_bus_ids = []
