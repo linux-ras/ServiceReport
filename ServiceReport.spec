@@ -1,5 +1,5 @@
 %define name ServiceReport
-%define version 2.2.4
+%define version 2.2.5
 %define release 1
 
 # By default python 3 is used to build the package.
@@ -53,6 +53,14 @@ systemctl start servicereport.service
 /usr/bin/*
 
 %changelog
+
+* Tue Jul 8 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5-1
+- New plugin to validate and repair spyre configuration
+- Remove PrivateDevices from ServiceReprot service
+- Remove type=oneshot from ServiceReport service
+- Couple of bug fixes in spyre plugin
+- sos report plugin to collect spyre data
+- Change to include sos report plugin in to rpm
 
 * Fri Nov 15 2019 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.1
 - First Open source release
