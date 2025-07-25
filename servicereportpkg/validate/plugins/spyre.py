@@ -53,7 +53,7 @@ class Spyre(Plugin, Scheme):
         return False
 
     @classmethod
-    def is_valid(cls):
+    def is_applicable(cls):
         """Returns True if plugin is applicable otherwise False"""
 
         return Spyre.is_spyre_card_exists()
