@@ -7,6 +7,7 @@
 
 
 import os
+import grp
 import stat
 import re
 import shutil
@@ -117,14 +118,25 @@ class SpyreRepair(RepairPlugin):
         """Fix VFIO device permission"""
 
         vfio_dir = "/dev/vfio/"
+        group_name = 'sentient'
+        try:
+            gid = grp.getgrnam(group_name).gr_gid
+        except Exception as e:
+            self.log.error("Failed to get groupid of group: %s", group_name)
+            vfio_device_permission_check.set_note(Notes.FAIL_TO_FIX)
+            return
+
         for name in os.listdir(vfio_dir):
             full_path = vfio_dir + name
             try:
                 mode = os.stat(full_path).st_mode
                 if stat.S_ISCHR(mode):
-                    os.chmod(full_path, 0o666)
+                    os.chmod(full_path, 0o660)
+                    if os.stat(full_path).st_gid != gid:
+                        os.chown(full_path, -1, gid)
+
             except Exception as e:
-                self.log.error("Failed to %s file permission to 0o666", full_path)
+                self.log.error("Failed to set %s file permission to 0o660", full_path)
 
         re_check = plugin_obj.check_vfio_access_permission()
         if re_check.get_status():
@@ -297,10 +309,10 @@ class SpyreRepair(RepairPlugin):
             vfio_kernel_mod_check.set_note(Notes.FAIL_TO_FIX)
 
         vfio_device_permission_check = check_dir["VFIO device permission"]
-        if vfio_device_permission_check.get_status() is False:
-            self.fix_vfio_perm_check(plugin_obj, vfio_device_permission_check)
-        elif vfio_device_permission_check.get_status() is None:
+        if user_group_conf_check.get_status() is not True or vfio_device_permission_check.get_status() is None:
             vfio_device_permission_check.set_note(Notes.NOT_FIXABLE)
+        elif vfio_device_permission_check.get_status() is False:
+            self.fix_vfio_perm_check(plugin_obj, vfio_device_permission_check)
 
         sos_package_check = check_dir["sos package"]
         if sos_package_check.get_status() is False:

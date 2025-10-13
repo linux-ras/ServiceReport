@@ -6,6 +6,7 @@
 """Plugin to check spyre configuration"""
 
 import os
+import grp
 import re
 import stat
 import pyudev
@@ -18,7 +19,7 @@ from servicereportpkg.validate.plugins import Plugin
 from servicereportpkg.check import FilesCheck
 from servicereportpkg.utils import is_package_installed
 from servicereportpkg.check import ConfigurationFileCheck
-from servicereportpkg.utils import is_read_write_to_all_users
+from servicereportpkg.utils import is_read_write_to_owner_group_users
 
 
 class Spyre(Plugin, Scheme):
@@ -105,7 +106,7 @@ class Spyre(Plugin, Scheme):
     def check_udev_rule(self):
         """VFIO udev rules configuration"""
 
-        vfio_udev = "SUBSYSTEM==\"vfio\", MODE=\"0666\""
+        vfio_udev = "SUBSYSTEM==\"vfio\", GROUP=\"sentient\", MODE=\"0660\""
         config_file = "/etc/udev/rules.d/95-vfio-3.rules"
 
         conf_check = ConfigurationFileCheck(self.check_udev_rule.__doc__,
@@ -248,14 +249,26 @@ class Spyre(Plugin, Scheme):
 
         if not os.path.isdir(vfio_dir):
             self.log.error("No %s directory", vfio_dir)
+            perm_check.set_status(False)
+            return perm_check
+
+        group_name = 'sentient'
+        try:
+            gid = grp.getgrnam(group_name).gr_gid
+        except Exception as e:
+            self.log.error("Failed to get groupid of group: %s", group_name)
+            perm_check.set_status(False)
             return perm_check
 
         for name in os.listdir(vfio_dir):
             full_path = vfio_dir + name
             try:
+                ret = True
                 mode = os.stat(full_path).st_mode
                 if stat.S_ISCHR(mode):
-                    ret = is_read_write_to_all_users(full_path)
+                    if os.stat(full_path).st_gid != gid:
+                        ret = False
+                    ret = ret & is_read_write_to_owner_group_users(full_path)
                     if not ret and status:
                         status = ret
                     perm_check.add_file(full_path, ret)

@@ -374,16 +374,16 @@ def update_grub():
     return False
 
 
-def is_read_write_to_all_users(file_path):
+def is_read_write_to_owner_group_users(file_path):
     """
     Check if a file has read and write permissions for owner,
-    group, and others.
+    group only
 
     Args:
         file_path (str): The full path to the file.
 
     Returns:
-        bool: True if all users (owner, group, others) have both read and write
+        bool: True if users (owner, group) have both read and write
               permissions, False otherwise. Also returns False if the file does
               not exist.
     """
@@ -393,8 +393,8 @@ def is_read_write_to_all_users(file_path):
     try:
         mode = os.stat(file_path).st_mode
         return (
-            bool(mode & stat.S_IROTH) and  # Read permission for others
-            bool(mode & stat.S_IWOTH) and  # Write permission for others
+            not (bool(mode & stat.S_IROTH) and  # Read permission for others
+                 bool(mode & stat.S_IWOTH)) and  # Write permission for others
             bool(mode & stat.S_IRUSR) and  # Read permission for owner
             bool(mode & stat.S_IWUSR) and  # Write permission for owner
             bool(mode & stat.S_IRGRP) and  # Read permission for group
