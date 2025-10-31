@@ -1,6 +1,6 @@
 %define name ServiceReport
 %define version 2.2.5
-%define release 2
+%define release 3
 
 # By default python 3 is used to build the package.
 %define python python3
@@ -54,7 +54,10 @@ systemctl start servicereport.service
 
 %changelog
 
-* Fri Jul 8 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.2
+* Fri Oct 31 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.3
+- [Spyre] change in vfio device access permissions
+
+* Fri Jul 25 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.2
 - Do not enable Spyre plugin if card is not present
 
 * Tue Jul 8 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5-1
