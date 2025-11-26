@@ -117,26 +117,9 @@ class SpyreRepair(RepairPlugin):
     def fix_vfio_perm_check(self, plugin_obj, vfio_device_permission_check):
         """Fix VFIO device permission"""
 
-        vfio_dir = "/dev/vfio/"
-        group_name = 'sentient'
-        try:
-            gid = grp.getgrnam(group_name).gr_gid
-        except Exception as e:
-            self.log.error("Failed to get groupid of group: %s", group_name)
-            vfio_device_permission_check.set_note(Notes.FAIL_TO_FIX)
-            return
-
-        for name in os.listdir(vfio_dir):
-            full_path = vfio_dir + name
-            try:
-                mode = os.stat(full_path).st_mode
-                if stat.S_ISCHR(mode):
-                    os.chmod(full_path, 0o660)
-                    if os.stat(full_path).st_gid != gid:
-                        os.chown(full_path, -1, gid)
-
-            except Exception as e:
-                self.log.error("Failed to set %s file permission to 0o660", full_path)
+        execute_command(["udevadm", "control", "--reload-rules"])
+        execute_command(["udevadm", "trigger", "--subsystem-match=vfio"])
+        execute_command(["udevadm", "settle"])
 
         re_check = plugin_obj.check_vfio_access_permission()
         if re_check.get_status():
