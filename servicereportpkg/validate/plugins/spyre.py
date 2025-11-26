@@ -106,7 +106,7 @@ class Spyre(Plugin, Scheme):
     def check_udev_rule(self):
         """VFIO udev rules configuration"""
 
-        vfio_udev = "SUBSYSTEM==\"vfio\", GROUP=\"sentient\", MODE=\"0660\""
+        vfio_udev = "SUBSYSTEM==\"vfio\", GROUP:=\"sentient\", MODE:=\"0660\""
         config_file = "/etc/udev/rules.d/95-vfio-3.rules"
 
         conf_check = ConfigurationFileCheck(self.check_udev_rule.__doc__,
@@ -117,8 +117,17 @@ class Spyre(Plugin, Scheme):
             with open(config_file, "r", encoding="utf-8") as file:
                 for line in file:
                     line = line.strip()
+                    if not line and line.startswith("#"):
+                        continue
                     if line == vfio_udev:
                         status = True
+                        break
+                    # If incorrect vfio rules exists in file which
+                    # will persist and overwrites the correct config
+                    # which present later validation fails.
+                    elif ('SUBSYSTEM=="vfio"' in line and
+                        ("GROUP:=" in line or "MODE:=" in line)):
+                        status = False
                         break
         except FileNotFoundError:
             self.log.error("File not found : %s", config_file)
