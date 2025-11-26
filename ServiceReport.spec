@@ -1,6 +1,6 @@
 %define name ServiceReport
 %define version 2.2.5
-%define release 3
+%define release 4
 
 # By default python 3 is used to build the package.
 %define python python3
@@ -53,6 +53,9 @@ systemctl start servicereport.service
 /usr/bin/*
 
 %changelog
+
+* Fri Nov 26 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.4
+- [spyre] fix vfio udev rule config and permission issue
 
 * Fri Oct 31 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.3
 - [Spyre] change in vfio device access permissions
