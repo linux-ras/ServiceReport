@@ -265,7 +265,10 @@ class Spyre(Plugin, Scheme):
             try:
                 ret = True
                 mode = os.stat(full_path).st_mode
-                if stat.S_ISCHR(mode):
+                # /dev/vfio/vfio file permissions doesn't need to be
+                # validated as its permissons doesnt affect
+                # the vfio spyre card permissions
+                if stat.S_ISCHR(mode) and name != 'vfio':
                     if os.stat(full_path).st_gid != gid:
                         ret = False
                     ret = ret & is_read_write_to_owner_group_users(full_path)
