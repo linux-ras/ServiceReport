@@ -13,6 +13,7 @@ import re
 import shutil
 
 from servicereportpkg.check import Notes
+from servicereportpkg.utils import add_to_file
 from servicereportpkg.utils import append_to_file
 from servicereportpkg.utils import execute_command
 from servicereportpkg.utils import install_package
@@ -57,13 +58,48 @@ class SpyreRepair(RepairPlugin):
         else:
             user_mem_conf_check.set_note(Notes.FAIL_TO_FIX)
 
+    def verify_if_vfio_udev_rule_is_redundant(self, udev_rule):
+        """Verify if VFIO udev rule is Redundant"""
+
+        if udev_rule and ('SUBSYSTEM=="vfio"' in udev_rule):
+            splits = udev_rule.split(',')
+            length_splits = len(splits)
+            if length_splits  <= 3:
+                splits = [condition.strip() for condition in splits]
+                has_group = any('GROUP' in part for part in splits)
+                has_mode = any('MODE' in part for part in splits)
+                if ((length_splits==2 and (has_mode or has_group)) or
+                    (length_splits==3 and has_mode and has_group) or
+                    (length_splits==1)):
+                    return True
+        return False
+
     def fix_udev_rules_conf(self, plugin_obj, udev_rules_conf_check):
         """Fix VFIO udev rules"""
 
-        for config, val in udev_rules_conf_check.get_config_attributes().items():
-            if not val["status"]:
-                append_to_file(udev_rules_conf_check.get_file_path(),
-                               "\n"+config)
+        updated_lines = []
+        if not os.path.exists(udev_rules_conf_check.get_file_path()):
+            key = next(iter(udev_rules_conf_check.get_config_attributes()))
+            updated_lines.append(key + "\n")
+        else:
+            for config, val in udev_rules_conf_check.get_config_attributes().items():
+                if not val["status"]:
+                    try:
+                        with open(udev_rules_conf_check.get_file_path(), "r", encoding="utf-8") as file:
+                            lines = file.readlines()
+                        updated_lines.append(config+"\n")
+                        for line in lines:
+                            # if a vfio udev rule is redundant incorrect or old rule will be
+                            # removed
+                            if not self.verify_if_vfio_udev_rule_is_redundant(line.strip()):
+                                updated_lines.append(line)
+                    except FileNotFoundError:
+                        self.log.error("File not found : %s", udev_rules_conf_check.get_file_path())
+
+        updated_string = "".join(updated_lines)
+        add_to_file(udev_rules_conf_check.get_file_path(),
+                    updated_string)
+
         re_check = plugin_obj.check_udev_rule()
         if re_check.get_status():
             udev_rules_conf_check.set_status(True)
