@@ -20,13 +20,13 @@ from servicereportpkg.check import FilesCheck
 from servicereportpkg.utils import is_package_installed
 from servicereportpkg.check import ConfigurationFileCheck
 from servicereportpkg.utils import is_read_write_to_owner_group_users
+from servicereportpkg.validate.schemes.schemes import FedoraScheme, RHELScheme
 
 
-class Spyre(Plugin, Scheme):
+class Spyre(object):
     """Spyre configuration checks"""
 
     def __init__(self):
-        Plugin.__init__(self)
         self.name = Spyre.__name__
         self.description = Spyre.__doc__
 
@@ -290,6 +290,12 @@ class Spyre(Plugin, Scheme):
         perm_check.set_status(status)
         return perm_check
 
+class SpyreSoS(Spyre):
+    """Spyre SoS configuration check"""
+
+    def __init__(self):
+        Spyre.__init__(self)
+
     def check_sos_package(self):
         """sos package"""
 
@@ -355,3 +361,17 @@ class Spyre(Plugin, Scheme):
 
         sos_config_check.set_status(status)
         return sos_config_check
+
+class SpyreFedora(SpyreSoS, Plugin, FedoraScheme):
+    """Spyre Fedora configuration checks"""
+
+    def __init__(self):
+        Plugin.__init__(self)
+        SpyreSoS.__init__(self)
+
+class SpyreRHEL(SpyreSoS, Plugin, RHELScheme):
+    """Spyre RHEL configuration checks"""
+
+    def __init__(self):
+        Plugin.__init__(self)
+        SpyreSoS.__init__(self)

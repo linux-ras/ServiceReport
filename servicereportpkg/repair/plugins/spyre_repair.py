@@ -333,17 +333,19 @@ class SpyreRepair(RepairPlugin):
         elif vfio_device_permission_check.get_status() is False:
             self.fix_vfio_perm_check(plugin_obj, vfio_device_permission_check)
 
-        sos_package_check = check_dir["sos package"]
-        if sos_package_check.get_status() is False:
-            self.fix_sos_package(plugin_obj, sos_package_check)
-        elif sos_package_check.get_status is None:
-            sos_package_check.set_note(Notes.NOT_FIXABLE)
+        if "sos package" in check_dir.keys():
+            sos_package_check = check_dir["sos package"]
+            if sos_package_check.get_status() is False:
+                self.fix_sos_package(plugin_obj, sos_package_check)
+            elif sos_package_check.get_status is None:
+                sos_package_check.set_note(Notes.NOT_FIXABLE)
 
-        sos_config_check = check_dir["sos config"]
-        # if sos package is not intalled, not much can be done
-        if not sos_package_check.get_status():
-            sos_config_check.set_note(Notes.NOT_FIXABLE)
-        elif sos_config_check.get_status() is False:
-            self.fix_sos_config(plugin_obj, sos_config_check)
-        elif sos_config_check.get_status is None:
-            sos_config_check.set_note(Notes.NOT_FIXABLE)
+        if "sos config" in check_dir.keys():
+            sos_config_check = check_dir["sos config"]
+            # if sos package is not intalled, not much can be done
+            if not sos_package_check.get_status():
+                sos_config_check.set_note(Notes.NOT_FIXABLE)
+            elif sos_config_check.get_status() is False:
+                self.fix_sos_config(plugin_obj, sos_config_check)
+            elif sos_config_check.get_status is None:
+                sos_config_check.set_note(Notes.NOT_FIXABLE)
