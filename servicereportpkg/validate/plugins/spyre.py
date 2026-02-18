@@ -136,27 +136,74 @@ class Spyre(Plugin, Scheme):
         conf_check.set_status(status)
         return conf_check
 
+    """
+    is_mem_limit_config_valid(): Verify whether the current memlock
+    configuration satisfies or exceeds the expected VFIO memory configuration.
+
+    Args:
+        config_file (str): File path to existing configuration
+        conf (str): Expected memlimit configuration
+
+    Returns:
+        bool: True if current memlimit config is valid, False otherwise.
+    """
+    def is_mem_limit_config_valid(self, config_file, conf):
+
+        # Example strings matching the pattern:
+        # "@sentient 1234", "@sentient unlimited", "@sentient 7890",
+        # "@sentient -memlock unlimited"
+        pattern = r'^(@sentient.+)\s+(unlimited|\d+)$'
+        status = False
+        try:
+            with open(config_file, "r", encoding="utf-8") as file:
+                for line in file:
+                    line = line.strip()
+                    if not line:
+                        continue
+
+                    if line == conf:
+                        status = True
+                        continue
+
+                    line_match = re.match(pattern, line)
+                    conf_match = re.match(pattern, conf)
+                    if line_match and conf_match:
+                        line_str = line_match.group(1)
+                        line_value = line_match.group(2)
+                        conf_str = conf_match.group(1)
+                        conf_value = conf_match.group(2)
+                        if line_str == conf_str:
+                            if (line_value == "unlimited"
+                                    or (int(line_value) >= int(conf_value))):
+                                status = True
+                            else:
+                                status = False
+
+        except FileNotFoundError:
+            self.log.error("File not found : %s", config_file)
+            status = False
+
+        except ValueError as e:
+            self.log.error("Type casting error: %s", e)
+            status = False
+
+        return status
+
     def check_memlock_conf(self):
         """User memlock configuration"""
 
-        vfio_mem_conf = ["@sentient - memlock 134217728"]
+        memlimit = 134217728
+        vfio_mem_conf = [f"@sentient - memlock {memlimit}"]
         config_file = "/etc/security/limits.d/memlock.conf"
 
         conf_check = ConfigurationFileCheck(self.check_memlock_conf.__doc__,
                                             config_file)
 
         status = True
-        try:
-            with open(config_file, "r", encoding="utf-8") as file:
-                for line in file:
-                    line = line.strip()
-                    if line in vfio_mem_conf:
-                        conf_check.add_attribute(line, True, None, None)
-                        vfio_mem_conf.remove(line)
-
-        except FileNotFoundError:
-            self.log.error("File not found : %s", config_file)
-            status = False
+        for conf in vfio_mem_conf[:]:
+            if self.is_mem_limit_config_valid(config_file, conf):
+                conf_check.add_attribute(conf, True, None, None)
+                vfio_mem_conf.remove(conf)
 
         if vfio_mem_conf:
             status = False
