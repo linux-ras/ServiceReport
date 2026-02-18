@@ -53,16 +53,25 @@ class SpyreExternal(Plugin, IndependentPlugin):
             "lsslot -c phb",
         ])
 
-        self.add_cmd_output([
-            "podman system df",
-            "podman system df -v",
-            ])
-
         self.add_copy_spec([
             "/etc/modprobe.d/vfio-pci.conf",
             "/etc/udev/rules.d/95-vfio-3.rules",
             "/etc/security/limits.d/memlock.conf",
         ])
+
+        spyre_users = self.get_spyre_users()
+        # To always collect data for root user regardless
+        if 'root' not in spyre_users:
+            spyre_users.append('root')
+        for user in spyre_users:
+            # collects podman disk usage data
+            command = f"sudo -iu {user} "
+            if user == 'root':
+                command = ""
+            self.add_cmd_output([
+                command + "podman system df",
+                command + "podman system df -v",
+            ])
 
     def get_spyre_cards(self):
         context = pyudev.Context()
@@ -81,4 +90,35 @@ class SpyreExternal(Plugin, IndependentPlugin):
 
         return spyre_cards_bus_ids
 
+    """
+    get_spyre_users(): Get the names of users belonging to
+    the sentient group.
+
+    Currently, all users belonging to the sentient group are
+    considered Spyre card users.
+
+    Args:
+    None
+
+    Returns:
+    List of spyre card users
+    """
+    def get_spyre_users(self):
+        sentient_users = []
+        getent_cmd = self.exec_cmd("getent group sentient")
+        if getent_cmd['status'] == 0 and getent_cmd['output'].strip():
+            for line in getent_cmd['output'].splitlines():
+                line = line.strip().split(':')
+
+                # Expected line format
+                # group_name:x:group_id:user1,user2
+                # No user at this line
+                if len(line) < 4:
+                    continue
+
+                for user in line[3].split(','):
+                    if user.strip() and user not in sentient_users:
+                        sentient_users.append(user)
+
+        return sentient_users
 # vim: set et ts=4 sw=4 :
