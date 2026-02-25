@@ -46,10 +46,29 @@ class SpyreRepair(RepairPlugin):
     def fix_user_mem_conf(self, plugin_obj, user_mem_conf_check):
         """Fix memory configuration usergroup"""
 
+        file_path = user_mem_conf_check.get_file_path()
+        lines = []
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                lines = file.readlines()
+        except FileNotFoundError:
+            self.log.error("File not found : %s", user_mem_conf_check.get_file_path())
+
+        updated_lines = []
+        for line in lines:
+            # if a user mem config rule is redundant incorrect or old rule will be
+            # removed
+            if not line.strip().startswith('@sentient'):
+                updated_lines.append(line)
+
         for config, val in user_mem_conf_check.get_config_attributes().items():
             if not val["status"]:
-                append_to_file(user_mem_conf_check.get_file_path(),
-                               "\n"+config)
+                updated_lines.append("\n"+config)
+
+        if updated_lines:
+            updated_string = "".join(updated_lines)
+            add_to_file(file_path,
+                       updated_string)
 
         re_check = plugin_obj.check_memlock_conf()
         if re_check.get_status():
