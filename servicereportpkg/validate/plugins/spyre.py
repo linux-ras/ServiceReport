@@ -30,10 +30,21 @@ class Spyre(Plugin, Scheme):
         self.name = Spyre.__name__
         self.description = Spyre.__doc__
 
-    @classmethod
-    def is_spyre_card_exists(cls):
-        """Return True if spyre exists in the system otherwise False"""
+    """
+    get_number_of_spyre_cards(): Get the number of spyre cards available in
+    the system.
 
+    Args:
+        None
+
+    Returns:
+        int: Number of spyre cards in the system.
+    """
+    @classmethod
+    def get_number_of_spyre_cards(cls):
+        """Returns number of spyre cards in the system"""
+
+        number_of_cards = 0
         context = pyudev.Context()
         # IBM vendor ID
         spyre_vendor_ids = ["0x1014"]
@@ -49,15 +60,15 @@ class Spyre(Plugin, Scheme):
             if device_id not in spyre_device_ids:
                 continue
 
-            return True
+            number_of_cards += 1
 
-        return False
+        return number_of_cards
 
     @classmethod
     def is_applicable(cls):
         """Returns True if plugin is applicable otherwise False"""
 
-        return Spyre.is_spyre_card_exists()
+        return Spyre.get_number_of_spyre_cards() > 0
 
     def check_driver_config(self):
         """VFIO Driver configuration"""
@@ -192,7 +203,8 @@ class Spyre(Plugin, Scheme):
     def check_memlock_conf(self):
         """User memlock configuration"""
 
-        memlimit = 134217728
+        num_cards = Spyre.get_number_of_spyre_cards()
+        memlimit = num_cards * 134234112
         vfio_mem_conf = [f"@sentient - memlock {memlimit}"]
         config_file = "/etc/security/limits.d/memlock.conf"
 
