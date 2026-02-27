@@ -1,6 +1,6 @@
 %define name ServiceReport
 %define version 2.2.5
-%define release 4
+%define release 5
 
 # By default python 3 is used to build the package.
 %define python python3
@@ -53,6 +53,10 @@ systemctl start servicereport.service
 /usr/bin/*
 
 %changelog
+
+* Fri Feb 27 2026 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.5
+- [spyre] memlock check updates
+- [spyre-sos] Run podman df for all Spyre users and root
 
 * Fri Nov 26 2025 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.4
 - [spyre] fix vfio udev rule config and permission issue
