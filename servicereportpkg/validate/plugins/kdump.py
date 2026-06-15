@@ -520,12 +520,14 @@ class KdumpSuSE(Kdump, Plugin, SuSEScheme):
             if return_code is None:
                 continue
 
-            if self.dump_comp_name not in str(stdout):
-                continue
+            for comp in self.dump_comp_name:
+                if comp in str(stdout):
+                    status = True
+                    self.log.debug("%s component found in %s", comp, initrd)
+                    break
 
-            status = True
-            self.log.debug("%s component found in %s", self.dump_comp_name, initrd)
-            break
+            if status:
+                break
 
         return Check(self.check_dump_component_in_initrd.__doc__,
                      status)
