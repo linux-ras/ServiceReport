@@ -366,3 +366,7 @@ class SpyreRepair(RepairPlugin):
             self.fix_sos_config(plugin_obj, sos_config_check)
         elif sos_config_check.get_status is None:
             sos_config_check.set_note(Notes.NOT_FIXABLE)
+
+        max_spyre_cards_check = check_dir["Spyre card limit"]
+        if max_spyre_cards_check.get_status() is not True:
+            max_spyre_cards_check.set_note(Notes.NOT_FIXABLE)
