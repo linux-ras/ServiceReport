@@ -414,3 +414,23 @@ class Spyre(Plugin, Scheme):
 
         sos_config_check.set_status(status)
         return sos_config_check
+
+    def check_max_spyre_cards_supported(self):
+        """Maximum Spyre cards supported in system"""
+
+        max_supported_cards = 24
+        num_cards = Spyre.get_number_of_spyre_cards()
+        card_check = Check(self.check_max_spyre_cards_supported.__doc__)
+        status = num_cards <= max_supported_cards
+
+        if not status:
+            message = (
+                f"\nBad configuration detected.\n"
+                f"Number of Spyre cards found: {num_cards}\n"
+                f"Maximum Spyre cards supported in system: {max_supported_cards}\n"
+                f"Please reduce the number of Spyre cards to {max_supported_cards} or fewer.\n"
+            )
+            card_check.set_message(message)
+
+        card_check.set_status(status)
+        return card_check
