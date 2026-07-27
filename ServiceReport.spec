@@ -1,6 +1,6 @@
 %define name ServiceReport
 %define version 2.2.5
-%define release 5
+%define release 6
 
 # By default python 3 is used to build the package.
 %define python python3
@@ -53,6 +53,9 @@ systemctl start servicereport.service
 /usr/bin/*
 
 %changelog
+
+* Mon Jul 27 2026 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.6
+- [spyre] add check for maximum supported Spyre cards
 
 * Fri Feb 27 2026 Sourabh Jain <sourabhjain@linux.ibm.com> 2.2.5.5
 - [spyre] memlock check updates
