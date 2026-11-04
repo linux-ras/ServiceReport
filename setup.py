@@ -19,8 +19,7 @@ setup(packages=find_packages(),
       data_files=[('share/man/man8', ['man/servicereport.8']),
                   ('share/doc/ServiceReport', ['README.md']),
                   ('share/licenses/ServiceReport', ['COPYING']),
-                  ('/usr/lib/systemd/system',
-                   ['service/servicereport.service'])],
+                  ('lib/systemd/system', ['service/servicereport.service'])],
       classifiers=[
           'Development Status :: 4 - Beta',
           'Programming Language :: Python'])
