@@ -20,6 +20,7 @@ BuildArch: ppc64le
 Vendor: IBM Corp.
 BuildRequires: %{python} systemd
 BuildRequires: %{python}-setuptools
+BuildRequires: %{python}-pip
 Requires: %{python} systemd
 
 %description
@@ -31,10 +32,10 @@ Capture (FFDC) configuration and optionally repairs the incorrect configuration
 %setup -q
 
 %build
-%{python} setup.py build
+%{python} -mpip wheel --verbose --progress-bar off --disable-pip-version-check --use-pep517 --no-build-isolation --no-deps --wheel-dir ./build .
 
 %install
-%{python} setup.py install --root=$RPM_BUILD_ROOT
+%{python} -mpip install --verbose --progress-bar off --disable-pip-version-check --root $RPM_BUILD_ROOT --no-compile --ignore-installed --no-deps --no-index --find-links ./build servicereport
 
 %post
 systemctl enable servicereport.service

@@ -1,0 +1,36 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+dynamic = ['version']
+name = 'ServiceReport'
+description = 'Validation tool to verify First Failure Data Capture (FFDC) configurations'
+readme = {file = 'README.md', content-type = 'text/markdown'}
+authors = [
+{name = 'Sourabh Jain', email = 'sourabhjain@linux.ibm.com'},
+]
+license = 'GPL-2.0-only'
+license-files = ['COPYING']
+requires-python = '>=3.6'
+classifiers = [
+'Development Status :: 4 - Beta',
+'Programming Language :: Python',
+]
+
+[project.scripts]
+servicereport = 'servicereportpkg:main'
+
+[project.urls]
+Homepage = 'https://github.com/linux-ras/ServiceReport'
+Repository = 'https://github.com/linux-ras/ServiceReport'
+Issues = 'https://github.com/linux-ras/ServiceReport/issues'
+
+[tool.setuptools.data-files]
+'share/man/man8' = ['man/servicereport.8']
+'share/doc/ServiceReport' = ['README.md']
+'share/licenses/ServiceReport' = ['COPYING']
+'lib/systemd/system' = ['service/servicereport.service']
+
+[tool.setuptools.dynamic]
+version = {attr = 'servicereportpkg.__version__'}

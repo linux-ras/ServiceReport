@@ -88,12 +88,6 @@ def parse_commandline_args(args):
     return parser.parse_args(args)
 
 
-def get_version():
-    """Returns the tool version"""
-
-    return __version__
-
-
 def get_dump_plugin(validation_results):
     """Returns the object list of configured dump plugin"""
 
@@ -127,7 +121,7 @@ def main():
 
     log = setup_logger(cmd_opts.log_file, cmd_opts.verbose)
 
-    print(TOOL_NAME + " " + get_version()+"\n")
+    print(TOOL_NAME + " " + __version__ + "\n")
 
     if cmd_opts.cmdarg_version:
         return 0

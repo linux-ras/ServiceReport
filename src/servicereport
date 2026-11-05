@@ -9,6 +9,9 @@
 
 import sys
 
+# This is no longer installed, only useful for running the script from a git
+# tree directly
+
 from servicereportpkg import main
 
 if __name__ == "__main__":
