@@ -10,7 +10,7 @@ Summary: A tool to validate and repair First Failure Data Capture (FFDC) configu
 Version: %{version}
 Release: %{release}
 Source0: https://github.com/linux-ras/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-License: GPLv2+
+License: GPL-2.0-only
 Group: System/RAS
 URL: https://github.com/linux-ras/ServiceReport
 
